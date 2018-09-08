@@ -1,10 +1,8 @@
-
-
+console.log('Hello Lucas :-)');
 ///////QUIZ CONTROLLER/////////////
-//1
 let quizController = (function() {
 
-    //4
+
     ////Question Constructor///
     function Question(id, questionText, options, correctAnswer) {
         this.id = id;
@@ -13,15 +11,33 @@ let quizController = (function() {
         this.correctAnswer = correctAnswer;
     }
 
-    //13
+      let questionLocalStorage = {
+
+          setQuestionCollection: function(newCollection) {
+              localStorage.setItem('questionCollection', JSON.stringify(newCollection));
+          },
+
+          getQuestionCollection: function() {
+              return JSON.parse(localStorage.getItem('questionCollection'));
+          },
+
+          removeQuestionCollection: function() {
+              localStorage.removeItem('questionCollection');
+          }
+      }
+
+
     return {
-        //14
+
         addQuestionOnLocalStorage: function(newQuestText, opts) {
-            let optionsArr, corrAns, questionId, newQuestion;
+            let optionsArr, corrAns, questionId, newQuestion, getStoredQuests;
+
+            if(questionLocalStorage.getQuestionCollection() === null) {
+              questionLocalStorage.setQuestionCollection([]);
+            }
 
             optionsArr = [];
 
-            questionId = 0;
 
             for (let i = 0; i < opts.length; i++) {
                 if(opts[i].value !== ""){
@@ -32,22 +48,29 @@ let quizController = (function() {
                 }
             }
 
+              //[ {id: 0} {id: 1} ]
+              if(questionLocalStorage.getQuestionCollection().length > 0) {
+                questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
+              } else {
+                questionId = 0;
+              }
+
               newQuestion = new Question(questionId, newQuestText.value, optionsArr, corrAns);
 
-              console.log(newQuestion);
+              getStoredQuests = questionLocalStorage.getQuestionCollection();
+              getStoredQuests.push(newQuestion);
+              questionLocalStorage.setQuestionCollection(getStoredQuests);
 
-            // 18
+              console.log(questionLocalStorage.getQuestionCollection());
             // console.log('Hi');
         }
     };
-
 })();
 
 ///////////UI CONTROLLER//////
-//3
+
 let UIController = (function() {
 
-    //5
     let domItems = {
         //Admin Panel Elements/////
         questInsertBtn: document.getElementById('question-insert-btn'), //6
@@ -55,7 +78,7 @@ let UIController = (function() {
         adminOptions: document.querySelectorAll('.admin-option') //16
     };
 
-    //7
+
     return {
         getDomItems: domItems //8
     };
@@ -63,19 +86,14 @@ let UIController = (function() {
 })();
 
 ///////////////////////CONTROLLER/////
-//3
+
 let controller = (function(quizCtrl, UICtrl) {
 
-    //11
     let selectedDomItems = UICtrl.getDomItems;
 
-    //9 -- //12 (change with var selectedDomItems)
     selectedDomItems.questInsertBtn.addEventListener('click', function() {
-        //10
         // console.log('Works');
-        //17
         quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, selectedDomItems.adminOptions);
-
     });
 
 })(quizController, UIController);
