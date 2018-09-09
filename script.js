@@ -283,13 +283,28 @@ let UIController = (function() {
                   // console.log('Delete FX works Lucas');
                 }
                 domItems.questDeleteBtn.onclick = deleteQuestion;
-
-
             }
+        },
 
+        clearQuestList: function(storageQuestList) {
 
-        }
-    };
+          if(storageQuestList.getQuestionCollection() !== null) {
+
+            if(storageQuestList.getQuestionCollection().length > 0) {
+
+              let conf = confirm('WARNING! You will lose entire question list');
+              // console.log(conf);
+                if(conf) {
+                  storageQuestList.removeQuestionCollection();
+                  domItems.insertedQuestsWrapper.innerHTML = '';
+                }
+
+              }
+            }
+          // console.log(storageQuestList);
+
+          }
+        };
 
 })();
 
@@ -320,6 +335,10 @@ let controller = (function(quizCtrl, UICtrl) {
 
         UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically, UICtrl.createQuestionList);
 
+    });
+
+    selectedDomItems.questsClearBtn.addEventListener('click', function() {
+      UICtrl.clearQuestList(quizCtrl.getQuestionLocalStorage);
     });
 
 })(quizController, UIController);
