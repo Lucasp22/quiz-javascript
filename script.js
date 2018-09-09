@@ -89,33 +89,60 @@ let quizController = (function() {
     };
 })();
 
-///////////UI CONTROLLER//////
+///////UI CONTROLLER///////
 
 let UIController = (function() {
 
-    let domItems = {
-        //Admin Panel Elements/////
-        questInsertBtn: document.getElementById('question-insert-btn'), //6
-        newQuestionText: document.getElementById('new-question-text'), //15
-        adminOptions: document.querySelectorAll('.admin-option') //16
+
+    var domItems = {
+        //Admin Panel Elements///////
+        questInsertBtn: document.getElementById('question-insert-btn'),
+        newQuestionText: document.getElementById('new-question-text'),
+        adminOptions: document.querySelectorAll('.admin-option'),
+        adminOptionsContainer: document.querySelector(".admin-options-container")
     };
 
 
     return {
-        getDomItems: domItems //8
+        getDomItems: domItems,
+        addInputsDynamically: function() {
+
+            let addInput = function() {
+
+                let inputHTML, z;
+
+                z = document.querySelectorAll(".admin-option").length;
+
+                inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '"><input type="text" class="admin-option admin-option-' + z + '" value=""></div>';
+
+                domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
+
+                domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
+
+                domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
+            }
+        
+            domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
+        }
     };
 
 })();
 
-///////////////////////CONTROLLER/////
+///////////////CONTROLLER////////////
 
 let controller = (function(quizCtrl, UICtrl) {
 
+
     let selectedDomItems = UICtrl.getDomItems;
 
+    UICtrl.addInputsDynamically();
+    //change with var selectedDomItems)///
     selectedDomItems.questInsertBtn.addEventListener('click', function() {
-        // console.log('Works');
-        quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, selectedDomItems.adminOptions);
+
+        let adminOptions = document.querySelectorAll('.admin-option');
+
+        quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
+
     });
 
 })(quizController, UIController);
