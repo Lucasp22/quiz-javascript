@@ -207,6 +207,25 @@ let UIController = (function() {
 
                 // console.log(optionHTML);
 
+
+                let backDefaultView = function() {
+                    let updatedOptions;
+
+                    domItems.newQuestionText.value = '';
+                    updatedOptions = document.querySelectorAll(".admin-option");
+
+                    for(let i = 0; i < updatedOptions.length; i++){
+                       updatedOptions[i].value = '';
+                       updatedOptions[i].previousElementSibling.checked = false;
+                     }
+                     domItems.questDeleteBtn.style.visibility = 'hidden';
+                     domItems.questUpdateBtn.style.visibility = 'hidden';
+                     domItems.questInsertBtn.style.visibility = 'visible';
+                     domItems.questsClearBtn.style.pointerEvents = '';
+                     updateQuestionListFn(storageQuestList);
+
+                   }
+
                 let updateQuestion = function() {
                   let newOptions, optionEls;
 
@@ -238,22 +257,7 @@ let UIController = (function() {
                            getStorageQuestList.splice(placeInArr, 1, foundItem);
                            storageQuestList.setQuestionCollection(getStorageQuestList);
 
-                           domItems.newQuestionText.value = '';
-                              for(let i = 0; i < optionEls.length; i++){
-                                optionEls[i].value = '';
-                                optionEls[i].previousElementSibling.checked = false;
-                              }
-
-                              domItems.questDeleteBtn.style.visibility = 'hidden';
-
-                              domItems.questUpdateBtn.style.visibility = 'hidden';
-
-                              domItems.questInsertBtn.style.visibility = 'visible';
-
-                              domItems.questsClearBtn.style.pointerEvents = '';
-
-                              updateQuestionListFn(storageQuestList);
-
+                           backDefaultView();
 
                       }else {
                           alert('You missed to check correct answer, or you checked answer without value');
@@ -268,6 +272,18 @@ let UIController = (function() {
 
                 }
                 domItems.questUpdateBtn.onclick = updateQuestion;
+
+                let deleteQuestion = function() {
+                  getStorageQuestList.splice(placeInArr, 1);
+
+                  storageQuestList.setQuestionCollection(getStorageQuestList);
+
+                  backDefaultView();
+
+                  // console.log('Delete FX works Lucas');
+                }
+                domItems.questDeleteBtn.onclick = deleteQuestion;
+
 
             }
 
