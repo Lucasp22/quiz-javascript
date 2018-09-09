@@ -162,7 +162,7 @@ let UIController = (function() {
 
         },
 
-        editQuestList: function(event, storageQuestList, addInpsDynFn) {
+        editQuestList: function(event, storageQuestList, addInpsDynFn, updateQuestionListFn) {
             let getId, getStorageQuestList, foundItem, placeInArr, optionHTML;
 
             if('question-'.indexOf(event.target.id)) {
@@ -237,6 +237,24 @@ let UIController = (function() {
                        if(foundItem.correctAnswer !== '') {
                            getStorageQuestList.splice(placeInArr, 1, foundItem);
                            storageQuestList.setQuestionCollection(getStorageQuestList);
+
+                           domItems.newQuestionText.value = '';
+                              for(let i = 0; i < optionEls.length; i++){
+                                optionEls[i].value = '';
+                                optionEls[i].previousElementSibling.checked = false;
+                              }
+
+                              domItems.questDeleteBtn.style.visibility = 'hidden';
+
+                              domItems.questUpdateBtn.style.visibility = 'hidden';
+
+                              domItems.questInsertBtn.style.visibility = 'visible';
+
+                              domItems.questsClearBtn.style.pointerEvents = '';
+
+                              updateQuestionListFn(storageQuestList);
+
+
                       }else {
                           alert('You missed to check correct answer, or you checked answer without value');
                           }
@@ -247,7 +265,7 @@ let UIController = (function() {
                           alert('Please, Insert Question');
                         }
 
-                   
+
                 }
                 domItems.questUpdateBtn.onclick = updateQuestion;
 
@@ -284,7 +302,7 @@ let controller = (function(quizCtrl, UICtrl) {
 
     selectedDomItems.insertedQuestsWrapper.addEventListener('click', function(e) {
 
-        UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically);
+        UICtrl.editQuestList(e, quizCtrl.getQuestionLocalStorage, UICtrl.addInputsDynamically, UICtrl.createQuestionList);
 
     });
 
