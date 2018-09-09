@@ -113,7 +113,8 @@ let UIController = (function() {
         adminOptionsContainer: document.querySelector(".admin-options-container"),
         insertedQuestsWrapper: document.querySelector(".inserted-questions-wrapper"),
         questUpdateBtn: document.getElementById('question-update-btn'),
-        questDeleteBtn: document.getElementById('question-delete-btn')
+        questDeleteBtn: document.getElementById('question-delete-btn'),
+        questsClearBtn: document.getElementById('questions-clear-btn')
     };
 
 
@@ -196,11 +197,60 @@ let UIController = (function() {
 
               domItems.questInsertBtn.style.visibility = 'hidden';
 
+              domItems.questsClearBtn.style.pointerEvents = 'none';
+
 
 
                 addInpsDynFn();
 
+                // console.log(foundItem);
+
                 // console.log(optionHTML);
+
+                let updateQuestion = function() {
+                  let newOptions, optionEls;
+
+                  newOptions = [];
+
+                  optionEls = document.querySelectorAll('.admin-option');
+                  // 143
+                  foundItem.questionText = domItems.newQuestionText.value;
+                  // 146
+                  foundItem.correctAnswer = '';
+
+                  for(var i = 0; i < optionEls.length; i++) {
+                      // 152
+                      if(optionEls[i].value !== '') {
+                          // 153
+                          newOptions.push(optionEls[i].value);
+                          // 154
+                          if(optionEls[i].previousElementSibling.checked) {
+                              // 155
+                              foundItem.correctAnswer = optionEls[i].value;
+                          }
+                      }
+                  }
+                   foundItem.options = newOptions;
+
+                   if(foundItem.questionText !== '') {
+                     if(foundItem.options.length > 1) {
+                       if(foundItem.correctAnswer !== '') {
+                           getStorageQuestList.splice(placeInArr, 1, foundItem);
+                           storageQuestList.setQuestionCollection(getStorageQuestList);
+                      }else {
+                          alert('You missed to check correct answer, or you checked answer without value');
+                          }
+                        } else {
+                          alert('You must insert at least two options');
+                        }
+                      } else {
+                          alert('Please, Insert Question');
+                        }
+
+                   
+                }
+                domItems.questUpdateBtn.onclick = updateQuestion;
+
             }
 
 
