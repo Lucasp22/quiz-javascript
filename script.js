@@ -123,7 +123,9 @@ let UIController = (function() {
         questsClearBtn: document.getElementById('questions-clear-btn'),
         //////quiz SECTION////
         askedQuestText: document.getElementById("asked-question-text"),
-        quizoptionsWrapper: document.querySelector(".quiz-options-wrapper")
+        quizoptionsWrapper: document.querySelector(".quiz-options-wrapper"),
+        progressBar: document.querySelector('progress'),
+        progressPar: document.getElementById('progress')
     };
 
 
@@ -329,7 +331,16 @@ let UIController = (function() {
                     }
 
           }
+        },
+        displayProgress: function(storageQuestList, progress) {
+
+            domItems.progressBar.max = storageQuestList.getQuestionCollection().length;
+
+            domItems.progressBar.value = progress.questionIndex + 1;
+
+            domItems.progressPar.textContent = (progress.questionIndex + 1) + '/' + storageQuestList.getQuestionCollection().length;
         }
+
         };
 
 })();
@@ -368,5 +379,7 @@ let controller = (function(quizCtrl, UICtrl) {
     });
 
     UICtrl.displayQuestion(quizCtrl.getQuestionLocalStorage, quizCtrl.getQuizProgress);
+
+    UICtrl.displayProgress(quizCtrl.getQuestionLocalStorage, quizCtrl.getQuizProgress);
 
 })(quizController, UIController);
