@@ -141,6 +141,9 @@ let quizController = (function() {
             checkAnswer: function(ans) {
 
               if(questionLocalStorage.getQuestionCollection()[quizProgress.questionIndex].correctAnswer === ans.textContent) {
+
+
+              currPersonData.score++;
                   return true;
               } else {
                   return false;
@@ -179,7 +182,9 @@ let quizController = (function() {
 
             getCurrPersonData: currPersonData,
 
-            getAdminFullName: adminFullName
+            getAdminFullName: adminFullName,
+
+            getPersonLocalStorage: personLocalStorage
         };
 })();
 
@@ -199,6 +204,8 @@ let UIController = (function() {
         questUpdateBtn: document.getElementById('question-update-btn'),
         questDeleteBtn: document.getElementById('question-delete-btn'),
         questsClearBtn: document.getElementById('questions-clear-btn'),
+        resultsListWrapper: document.querySelector('.results-list-wrapper'),
+        clearResultsBtn: document.getElementById('results-clear-btn'),
 //////quiz SECTION////
         quizSection: document.querySelector('.quiz-container'),
         askedQuestText: document.getElementById("asked-question-text"),
@@ -210,11 +217,14 @@ let UIController = (function() {
         instAnsDiv: document.getElementById('instant-answer-wrapper'),
         emotionIcon: document.getElementById('emotion'),
         nextQuestbtn: document.getElementById('next-question-btn'),
-////////////////////Landing Page Elements************/
+////////////////////Landing Page Elements//////
         landPageSection: document.querySelector('.landing-page-container'),
         startQuizBtn: document.getElementById('start-quiz-btn'),
         firstNameInput: document.getElementById('firstname'),
-        lastNameInput: document.getElementById('lastname')
+        lastNameInput: document.getElementById('lastname'),
+/////////Final Result Section Elements/////
+        finalResultSection: document.querySelector('.final-result-container'),
+        finalScoreText: document.getElementById('final-score-text')
 
     };
 
@@ -503,12 +513,79 @@ let UIController = (function() {
             } else {
                 alert('Please, enter your first name and last name');
             }
+        },
+
+        finalResult: function(currPerson) {
+
+            domItems.finalScoreText.textContent = currPerson.fullname[0] + ' ' + currPerson.fullname[1] + ', ' + 'your final score is ' + currPerson.score;
+
+            domItems.quizSection.style.display = 'none';
+
+            domItems.finalResultSection.style.display = 'block';
+
+        },
+
+        addResultOnPanel: function(userData) {
+
+          let resultHTML;
+
+          domItems.resultsListWrapper.innerHTML = '';
+
+          for(let i = 0; i < userData.getPersonData().length; i++) {
+
+              resultHTML = '<p class="person person-' + i + '"><span class="person-' + i + '">' + userData.getPersonData()[i].firstname + ' ' + userData.getPersonData()[i].lastname + ' - ' + userData.getPersonData()[i].score + ' Points</span><button id="delete-result-btn_' + userData.getPersonData()[i].id + '" class="delete-result-btn">Delete</button></p>';
+
+              domItems.resultsListWrapper.insertAdjacentHTML('afterbegin', resultHTML);
+          }
+
+
+        },
+
+        deleteResult: function(event, userData) {
+
+            let getId, personArr;
+
+            personArr = userData.getPersonData();
+
+            if('delete-result-btn_'.indexOf(event.target.id)) {
+
+                getId = parseInt(event.target.id.split('_')[1]);
+                // console.log(getId);
+                for(let i = 0; i < personArr.length; i++) {
+
+                    if(personArr[i].id === getId) {
+
+                        personArr.splice(i, 1);
+
+                        userData.setPersonData(personArr);
+                    }
+                }
+            }
+        },
+        clearResultList: function(userData) {
+
+            let conf;
+
+            if(userData.getPersonData() !== null) {
+
+                if(userData.getPersonData().length > 0) {
+
+                    conf = confirm('Warning! You will lose entire result list');
+
+                    if(conf) {
+
+                        userData.removePersonData();
+
+                        domItems.resultsListWrapper.innerHTML = '';
+                    }
+                }
+            }
         }
     };
 
 })();
 
-///////////////CONTROLLER////////////
+///////////////CONTROLLER////////////////////////////////////////////////////////////////
 
 let controller = (function(quizCtrl, UICtrl) {
 
@@ -566,7 +643,11 @@ let controller = (function(quizCtrl, UICtrl) {
 
                 if(quizCtrl.isFinished()) {
                   // Finish quiz
+
+
                   quizCtrl.addPerson();
+
+                  UICtrl.finalResult(quizCtrl.getCurrPersonData);
                   // console.log('Finished Lucas :-)');
                 }else {
 
@@ -607,5 +688,21 @@ let controller = (function(quizCtrl, UICtrl) {
           }
       });
   });
+
+  UICtrl.addResultOnPanel(quizCtrl.getPersonLocalStorage);
+
+  selectedDomItems.resultsListWrapper.addEventListener('click', function(e) {
+
+      UICtrl.deleteResult(e, quizCtrl.getPersonLocalStorage);
+
+      UICtrl.addResultOnPanel(quizCtrl.getPersonLocalStorage);
+  });
+
+  selectedDomItems.clearResultsBtn.addEventListener('click', function() {
+
+      UICtrl.clearResultList(quizCtrl.getPersonLocalStorage);
+  });
+
+
 
 })(quizController, UIController);
