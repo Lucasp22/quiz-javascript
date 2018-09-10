@@ -35,6 +35,43 @@ let quizController = (function() {
         questionIndex: 0
       };
 
+
+      ///////Person CONTROLLER////
+
+      function Person(id, fullname, email, score) {
+
+        this.id = id;
+        this.fullname = fullname;
+        this.email = email;
+        this.score = score;
+
+      }
+      let currPersonData = {
+          fulldetails: ['Lucas', 'lucas.p2222@gmail.com'],
+          score: 0
+      };
+
+
+      let personLocalStorage = {
+
+          setPersonData: function(newPersonData) {
+              localStorage.setItem('personData', JSON.stringify(newPersonData));
+          },
+
+          getPersonData: function() {
+              return JSON.parse(localStorage.getItem('personData'));
+          },
+
+          removePersonData: function() {
+              localStorage.removeItem('personData');
+          }
+      };
+
+      if(personLocalStorage.getPersonData() === null) {
+          personLocalStorage.setPersonData([]);
+      }
+
+
     return {
 
         getQuizProgress: quizProgress,
@@ -118,6 +155,28 @@ let quizController = (function() {
 
               return quizProgress.questionIndex + 1 === questionLocalStorage.getQuestionCollection().length;
 
+            },
+
+            addPerson: function() {
+                let newPerson, personId, personData;
+
+                if(personLocalStorage.getPersonData().length > 0) {
+
+                    personId = personLocalStorage.getPersonData()[personLocalStorage.getPersonData().length - 1].id + 1;
+
+                } else {
+                    personId = 0
+                }
+
+                newPerson = new Person(personId, currPersonData.fulldetails[0], currPersonData.fulldetails[1], currPersonData.score);
+
+                personData = personLocalStorage.getPersonData();
+
+                personData.push(newPerson);
+
+                personLocalStorage.setPersonData(personData);
+
+                console.log(newPerson);
             }
     };
 })();
@@ -464,7 +523,8 @@ let controller = (function(quizCtrl, UICtrl) {
 
                 if(quizCtrl.isFinished()) {
                   // Finish quiz
-                  console.log('Finished Lucas :-)');
+                  quizCtrl.addPerson();
+                  // console.log('Finished Lucas :-)');
                 }else {
 
                   UICtrl.resetDesign();
