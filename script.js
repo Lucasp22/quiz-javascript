@@ -102,7 +102,17 @@ let quizController = (function() {
                       alert('Please, Insert Question');
                       return false;
                 }
-        }
+            },
+
+            checkAnswer: function(ans) {
+
+              if(questionLocalStorage.getQuestionCollection()[quizProgress.questionIndex].correctAnswer === ans.textContent) {
+                  return true;
+              } else {
+                  return false;
+              }
+
+            }
     };
 })();
 
@@ -125,7 +135,12 @@ let UIController = (function() {
         askedQuestText: document.getElementById("asked-question-text"),
         quizoptionsWrapper: document.querySelector(".quiz-options-wrapper"),
         progressBar: document.querySelector('progress'),
-        progressPar: document.getElementById('progress')
+        progressPar: document.getElementById('progress'),
+        instAnsContainer: document.querySelector('.instant-answer-container'),
+        instAnsText: document.getElementById('instant-answer-text'),
+        instAnsDiv: document.getElementById('instant-answer-wrapper'),
+        emotionIcon: document.getElementById('emotion')
+
     };
 
 
@@ -244,19 +259,18 @@ let UIController = (function() {
                   newOptions = [];
 
                   optionEls = document.querySelectorAll('.admin-option');
-                  // 143
+
                   foundItem.questionText = domItems.newQuestionText.value;
-                  // 146
+
                   foundItem.correctAnswer = '';
 
                   for(var i = 0; i < optionEls.length; i++) {
-                      // 152
+
                       if(optionEls[i].value !== '') {
-                          // 153
+
                           newOptions.push(optionEls[i].value);
-                          // 154
+
                           if(optionEls[i].previousElementSibling.checked) {
-                              // 155
                               foundItem.correctAnswer = optionEls[i].value;
                           }
                       }
@@ -339,7 +353,40 @@ let UIController = (function() {
             domItems.progressBar.value = progress.questionIndex + 1;
 
             domItems.progressPar.textContent = (progress.questionIndex + 1) + '/' + storageQuestList.getQuestionCollection().length;
+        },
+
+        newDesign: function(ansResult, selectedAnswer) {
+          var twoOptions, index;
+
+          index = 0;
+
+          if(ansResult) {
+
+              index = 1;
+          }
+
+          twoOptions = {
+
+              instAnswerText: ['This is a wrong answer', 'This is a correct answer'],
+              instAnswerClass: ['red', 'green'],
+              emotionType: ['images/sad.png', 'images/happy.png'],
+              optionSpanBg: ['rgba(200, 0, 0, .7)', 'rgba(0, 250, 0, .2)']
+          };
+
+            domItems.quizoptionsWrapper.style.cssText = 'opacity: 0.6; pointer-events: none;';
+
+            domItems.instAnsContainer.style.opacity = "1";
+
+            domItems.instAnsText.textContent = twoOptions.instAnswerText[index];
+
+            domItems.instAnsDiv.className = twoOptions.instAnswerClass[index];
+
+            domItems.emotionIcon.setAttribute('src', twoOptions.emotionType[index]);
+
+            selectedAnswer.previousElementSibling.style.backgroundColor = twoOptions.optionSpanBg[index];
+
         }
+
 
         };
 
@@ -381,5 +428,21 @@ let controller = (function(quizCtrl, UICtrl) {
     UICtrl.displayQuestion(quizCtrl.getQuestionLocalStorage, quizCtrl.getQuizProgress);
 
     UICtrl.displayProgress(quizCtrl.getQuestionLocalStorage, quizCtrl.getQuizProgress);
+
+    selectedDomItems.quizoptionsWrapper.addEventListener('click', function(e) {
+      // console.log(e);
+
+      var updatedOptionsDiv = selectedDomItems.quizoptionsWrapper.querySelectorAll('div');
+      for(var i = 0; i < updatedOptionsDiv.length; i++) {
+          if(e.target.className === 'choice-' + i) {
+              // console.log(e.target.className);
+              var answer = document.querySelector('.quiz-options-wrapper div p.' + e.target.className);
+
+              let answerResult = quizCtrl.checkAnswer(answer);
+
+              UICtrl.newDesign(answerResult, answer);
+          }
+      }
+  });
 
 })(quizController, UIController);
