@@ -18,4 +18,4 @@ Help me to improve it, share and enjoy :) Please create a Github issue if there 
 
 
 ### License
-- GA Copyright © 2018
+- Lucas Padua Copyright © 2018
